@@ -396,6 +396,10 @@ def preview_question(question: BelugaQuestion):
     </div>
     """
 
+    # title
+    title = question.title.split('\n')
+    title = '<br>'.join(title)
+
     html = f"""
     {js_check_style}
     {highlight_js}
@@ -407,7 +411,7 @@ def preview_question(question: BelugaQuestion):
                     {type_badge}
                 </div>
             </div>
-            <div class='question-title'>{question.title}</div>
+            <div class='question-title'>{title}</div>
             <div class='question-badges'>{''.join(badges)}</div>
             <div class='option-wrapper'>
                 {option_buttons}
