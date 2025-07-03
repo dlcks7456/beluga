@@ -917,6 +917,11 @@ class Beluga:
                     else:
                         cond = cond.replace(f'#[{match}]', str(qnum_ref))
 
+
+        title = title.strip()
+        if cond:
+            cond = cond.strip()
+
         if inplace:
             self._append_inplace(
                 qtype, title, options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, change, etc_text
@@ -1179,6 +1184,6 @@ class Beluga:
                             js_code.append(js)
 
         if js_code :
-            with open('pre-logic.js', 'w') as f :
+            with open('pre-logic.js', 'w', encoding='utf-8') as f :
                 f.write('\n\n'.join(js_code))
 
