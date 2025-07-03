@@ -64,7 +64,7 @@ def set_dropdown(
         return dropdown_container.format(html=''.join(row_tags))
 
 
-def table(text: str, border: str = 'dashed', bg: bool = False, bg_color: str = 'rgba(215, 215, 215, 0.4)') -> str :
+def box(text: str, border: str = 'dashed', bg: bool = False, bg_color: str = 'rgba(215, 215, 215, 0.4)') -> str :
     # 배경색 스타일 설정
     bg_style = f' background-color: {bg_color};' if bg else ''
 
