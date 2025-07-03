@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "beluga"
+version = "0.1.0"
+description = "벨루가 에디터 엑셀 임포트용 라이브러리"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Chuck (Chan.Lee)", email = "dlcks7456@kakao.com"}
+]
+maintainers = [
+    {name = "Chuck (Chan.Lee)", email = "dlcks7456@kakao.com"}
+]
+keywords = ["survey", "questionnaire", "data-analysis", "pandas"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pandas>=1.3.0",
+    "openpyxl>=3.0.0",
+    "IPython>=7.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=21.0",
+    "flake8>=3.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/dlcks7456/beluga"
+Repository = "https://github.com/dlcks7456/beluga"
+Documentation = "https://github.com/dlcks7456/beluga#readme"
+Issues = "https://github.com/dlcks7456/beluga/issues"
+
+[tool.setuptools]
+packages = ["beluga"]
+
+[tool.setuptools.package-data]
+beluga = ["*.txt", "*.md"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
