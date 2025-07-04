@@ -2,7 +2,6 @@ import pandas as pd
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
-from .core import Beluga, create_question_df
 from .config import BelugaConfig
 from .errors import BelugaValidationError
 from .utils.html import *
