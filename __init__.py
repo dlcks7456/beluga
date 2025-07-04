@@ -33,12 +33,13 @@ def create_question_df() :
 
 class BelugaConfig:
     """Beluga 클래스의 설정을 관리하는 클래스입니다."""
-    def __init__(self, etc_text: str = '기타(직접 입력)', default_rotation: bool = False, dropdown_placeholder: str = '하나 선택...', total_text: str = '합계', display: bool = True):
+    def __init__(self, etc_text: str = '기타(직접 입력)', default_rotation: bool = False, dropdown_placeholder: str = '하나 선택...', total_text: str = '합계', display: bool = True, change: bool = True):
         self.etc_text = etc_text
         self.dropdown_placeholder = dropdown_placeholder
         self.total_text = total_text
         self.default_rotation = default_rotation
         self.display = display
+        self.change = change
 
 class BelugaValidationError(Exception):
     """Beluga 클래스 검증 에러"""
@@ -175,7 +176,7 @@ class Beluga:
         rotation: Optional[bool] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga' :
         """
@@ -201,13 +202,13 @@ class Beluga:
             Beluga: qid가 지정된 경우 해당 질문의 DataFrame, 아니면 마지막 추가된 질문의 DataFrame
         """
         rotation_val = self.config.default_rotation if rotation is None else rotation
-
+        change_val = self.config.change if change is None else change
         if scale :
             rotation_val = False
             etc = False
             na = None
 
-        self._validate_question(qid, title, None, None, change)
+        self._validate_question(qid, title, None, None, change_val)
         return self.append_question(
             qid=qid,
             qtype='객관식 단일' if not scale else '객관식 척도',
@@ -222,7 +223,7 @@ class Beluga:
             rotation=rotation_val,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -242,7 +243,7 @@ class Beluga:
         rotation: Optional[bool] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -269,7 +270,8 @@ class Beluga:
             Beluga: qid가 지정된 경우 해당 질문의 DataFrame, 아니면 마지막 추가된 질문의 DataFrame
         """
         rotation_val = self.config.default_rotation if rotation is None else rotation
-        self._validate_question(qid, title, min, max, change)
+        change_val = self.config.change if change is None else change
+        self._validate_question(qid, title, min, max, change_val)
 
         if max is None :
             max = len(options)
@@ -292,7 +294,7 @@ class Beluga:
             rotation=rotation_val,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -313,7 +315,7 @@ class Beluga:
         rotation: Optional[bool] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -340,7 +342,8 @@ class Beluga:
             Beluga: qid가 지정된 경우 해당 질문의 DataFrame, 아니면 마지막 추가된 질문의 DataFrame
         """
         rotation_val = self.config.default_rotation if rotation is None else rotation
-        self._validate_question(qid, title, min, max, change)
+        change_val = self.config.change if change is None else change
+        self._validate_question(qid, title, min, max, change_val)
 
         if max is None :
             max = len(options)
@@ -363,7 +366,7 @@ class Beluga:
             rotation=rotation_val,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -375,7 +378,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         multi: Optional[Union[int, list[str]]] = None,
         multi_atleast: bool = False,
         multi_post: str = None,
@@ -401,21 +404,18 @@ class Beluga:
         Returns:
             Beluga: 추가된 문항의 DataFrame
         """
-
+        change_val = self.config.change if change is None else change
         if multi is not None :
             if isinstance(multi, (int, list, dict)) :
                 multi_html = set_multi_input(n=multi, type='text', post_text=multi_post, width=multi_width)
             else :
                 raise BelugaValidationError("multi는 int, list[str], dict 형식이어야 합니다.")
-
             title = f'{title}\n{multi_html}'
-
             js = None
             if multi_atleast :
                 js = multi_text_atleast_js
             else :
                 js = multi_text_all_js
-
             if cond is not None :
                 if isinstance(cond, list) :
                     cond.append(js)
@@ -431,7 +431,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -443,7 +443,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -461,6 +461,7 @@ class Beluga:
         Returns:
             Beluga: 추가된 문항의 DataFrame
         """
+        change_val = self.config.change if change is None else change
         return self.append_question(
             qid=qid,
             qtype='주관식 주소',
@@ -468,7 +469,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -479,7 +480,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -497,6 +498,7 @@ class Beluga:
         Returns:
             Beluga: 추가된 문항의 DataFrame
         """
+        change_val = self.config.change if change is None else change
         return self.append_question(
             qid=qid,
             qtype='주관식 전화번호',
@@ -504,7 +506,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -516,7 +518,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -534,6 +536,7 @@ class Beluga:
         Returns:
             Beluga: 추가된 문항의 DataFrame
         """
+        change_val = self.config.change if change is None else change
         return self.append_question(
             qid=qid,
             qtype='주관식 날짜',
@@ -541,7 +544,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -557,7 +560,7 @@ class Beluga:
         fail: str = '',
         post_logic: str = '',
         post_text: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         multi: Optional[Union[int, list[str]]] = None,
         multi_post: str = None,
         multi_width: str = '70px',
@@ -585,7 +588,7 @@ class Beluga:
         Returns:
             Beluga: 추가된 문항의 DataFrame
         """
-
+        change_val = self.config.change if change is None else change
         if any(i is None for i in [min, max]) :
             raise BelugaValidationError("min, max 반드시 입력해야 합니다.")
 
@@ -623,7 +626,7 @@ class Beluga:
             post_text=post_text,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -638,7 +641,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -673,7 +676,8 @@ class Beluga:
             f'{score}) {right}'
         ]
         options = '\n'.join(options)
-        self._validate_question(qid, title, None, None, change)
+        change_val = self.config.change if change is None else change
+        self._validate_question(qid, title, None, None, change_val)
         return self.append_question(
             qid=qid,
             qtype=qtype,
@@ -682,7 +686,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -694,7 +698,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         """
@@ -712,6 +716,7 @@ class Beluga:
         Returns:
             Beluga: 추가된 문항의 DataFrame
         """
+        change_val = self.config.change if change is None else change
         return self.append_question(
             qid=qid,
             qtype='이미지',
@@ -719,7 +724,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
@@ -734,7 +739,7 @@ class Beluga:
         duplicate: bool = False,
         fail: str = '',
         post_logic: str = '',
-        change: bool = True,
+        change: Optional[bool] = None,
         inplace: bool = True,
     ) -> 'Beluga':
         if not isinstance(options, (dict, list)) or len(options) == 0:
@@ -743,6 +748,7 @@ class Beluga:
         if not isinstance(rows, (dict, list)) or len(rows) == 0:
             raise BelugaValidationError("rows는 빈 리스트가 아니어야 합니다.")
 
+        change_val = self.config.change if change is None else change
         selects = set_dropdown(options=options, rows=rows, placeholder=self.dropdown_placeholder)
         title = f'{title}\n{selects}'
 
@@ -783,7 +789,7 @@ class Beluga:
             cond=cond,
             fail=fail,
             post_logic=post_logic,
-            change=change,
+            change=change_val,
             inplace=inplace
         )
 
