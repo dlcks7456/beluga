@@ -71,6 +71,6 @@ def box(text: str, border: str = 'dashed', bg: bool = False, bg_color: str = 'rg
     # 테이블 스타일과 데이터 스타일에 배경색 추가
     table_style = f'width: 100%; font-size: 16px;{bg_style}'
 
-    html = f'''<table class="fr-tag mce-item-table" style="{table_style}"><tbody><tr><td style="padding: 10px; text-align: center; border: 1px {border} #979797;"><p class="fr-tag">{text}</p></td></tr></tbody></table>'''
+    html = f'''<table class="fr-tag mce-item-table" style="{table_style}"><tbody><tr><td style="padding: 10px; text-align: center; border: 1px {border} #979797;">{text}</td></tr></tbody></table>'''
 
     return html

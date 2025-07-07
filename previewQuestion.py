@@ -262,6 +262,31 @@ def preview_question(question: BelugaQuestion):
         line-height: 1.3;
         word-break: keep-all;
         margin-block: 10px;
+        max-height: 180px;
+        overflow-y: auto;
+        padding-right: 2px;
+        box-sizing: border-box;
+        scrollbar-color: #26a9df #f4fbfe;
+        scrollbar-width: thin;
+    }}
+    .beluga-survey-preview .question-title::-webkit-scrollbar {{
+        width: 8px;
+        background: #f4fbfe;
+        border-radius: 6px;
+    }}
+    .beluga-survey-preview .question-title::-webkit-scrollbar-thumb {{
+        background: #26a9df;
+        border-radius: 6px;
+        border: none;
+        min-height: 30px;
+        transition: background 0.2s;
+    }}
+    .beluga-survey-preview .question-title:hover::-webkit-scrollbar-thumb {{
+        background: #1e7fa6;
+    }}
+    .beluga-survey-preview .question-title::-webkit-scrollbar-track {{
+        background: #f4fbfe;
+        border-radius: 6px;
     }}
     .beluga-survey-preview .question-badges {{
         display: flex;
