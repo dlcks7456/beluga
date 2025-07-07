@@ -771,8 +771,8 @@ class Beluga:
             else :
                 cond = row_cond_js
 
+        js = dropdown_js.format(duplicate= 'true' if duplicate else 'false')
         if cond is not None :
-            js = dropdown_js.format(duplicate= 'true' if duplicate else 'false')
             if isinstance(cond, list) :
                 cond.append(js)
             else :
