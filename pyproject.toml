@@ -7,7 +7,7 @@ name = "beluga"
 version = "0.1.0"
 description = "벨루가 에디터 엑셀 임포트용 라이브러리"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Chuck (Chan.Lee)", email = "dlcks7456@kakao.com"}
 ]
