@@ -64,7 +64,10 @@ class Beluga:
         self.etc_text = self.config.etc_text
         self.dropdown_placeholder = self.config.dropdown_placeholder
         self.total_text = self.config.total_text
+        self.questions = []
         self._qid_cache = set()
+
+
 
     def set_etc_text(self, new_etc_text: str) -> None:
         """
@@ -370,6 +373,26 @@ class Beluga:
         )
 
 
+    def _check_multi_cond(self, multi_cond: Optional[Union[str, int, BelugaQuestion]]) -> str :
+        base = None
+        try :
+            if isinstance(multi_cond, BelugaQuestion) :
+                base = multi_cond
+            elif isinstance(multi_cond, str) :
+                base = [q for q in self.questions if q.qid == multi_cond][0]
+            elif isinstance(multi_cond, int) :
+                base = [q for q in self.questions if q.qnum == multi_cond][0]
+            else :
+                raise BelugaValidationError("multi_cond는 str 또는 int 형식이어야 합니다.")
+        except IndexError :
+            raise BelugaValidationError(f"multi_cond에 해당하는 문항이 없습니다. {multi_cond}")
+
+        row_cond_js = dropdown_row_cond.format(base=base.qnum)
+        return {
+            'js': row_cond_js,
+            'base': base
+        }
+
     def text(
         self,
         title: str,
@@ -378,7 +401,8 @@ class Beluga:
         fail: str = '',
         post_logic: str = '',
         change: Optional[bool] = None,
-        multi: Optional[Union[int, list[str]]] = None,
+        multi: Optional[Union[int, list[str], dict]] = None,
+        multi_cond: Optional[Union[str, int]] = None,
         multi_atleast: bool = False,
         multi_post: str = None,
         multi_width: str = '200px',
@@ -404,13 +428,31 @@ class Beluga:
             Beluga: 추가된 문항의 DataFrame
         """
         change_val = self.config.change if change is None else change
+
+        if multi_cond is not None :
+            chk_multi = self._check_multi_cond(multi_cond)
+            multi_cond_js = chk_multi['js']
+            multi_atleast = False
+            if cond is not None :
+                if isinstance(cond, list) :
+                    cond.append(multi_cond_js)
+                else :
+                    cond += f' && {multi_cond_js}'
+            else :
+                cond = multi_cond_js
+
+            if multi is None :
+                multi = chk_multi['base'].options
+
         if multi is not None :
             if isinstance(multi, (int, list, dict)) :
                 multi_html = set_multi_input(n=multi, type='text', post_text=multi_post, width=multi_width)
             else :
                 raise BelugaValidationError("multi는 int, list[str], dict 형식이어야 합니다.")
             title = f'{title}\n{multi_html}'
+
             js = None
+
             if multi_atleast :
                 js = multi_text_atleast_js
             else :
@@ -560,8 +602,8 @@ class Beluga:
         post_logic: str = '',
         post_text: str = '',
         change: Optional[bool] = None,
-        multi: Optional[Union[int, list[str]]] = None,
-        multi_post: str = None,
+        multi: Optional[Union[int, list[str], dict]] = None,
+        multi_cond: Optional[Union[str, int]] = None,
         multi_width: str = '70px',
         inplace: bool = True,
     ) -> 'Beluga':
@@ -580,7 +622,6 @@ class Beluga:
             post_logic (str): 응답 후 로직
             change (bool): 기존 QID 변경 여부
             multi (Optional[Union[int, list[str]]]): 다중 입력 설정 (개수 또는 라벨 목록)
-            multi_post (str): 다중 입력 후 텍스트
             multi_width (str): 입력 필드 너비
             inplace (bool): 현재 인스턴스에 추가할지 여부
 
@@ -591,15 +632,30 @@ class Beluga:
         if any(i is None for i in [min, max]) :
             raise BelugaValidationError("min, max 반드시 입력해야 합니다.")
 
-        if total is not None and multi is None :
-            raise BelugaValidationError("multi 형태로 변경 필요")
 
         qtype = '주관식 숫자'
 
-        if multi is not None :
+        if multi_cond is not None :
             qtype = '주관식 문자'
+            chk_multi = self._check_multi_cond(multi_cond)
+            multi_cond_js = chk_multi['js']
+            if cond is not None :
+                if isinstance(cond, list) :
+                    cond.append(multi_cond_js)
+                else :
+                    cond += f' && {multi_cond_js}'
+            else :
+                cond = multi_cond_js
+
+            if multi is None :
+                multi = chk_multi['base'].options
+
+        if total is not None and multi is None :
+            raise BelugaValidationError("multi 형태로 변경 필요")
+
+        if multi is not None :
             if isinstance(multi, (int, list, dict)) :
-                multi_html = set_multi_input(n=multi, type='number', post_text=multi_post, width=multi_width, total=total is not None, total_label=self.total_text)
+                multi_html = set_multi_input(n=multi, type='number', post_text=post_text, width=multi_width, total=total is not None, total_label=self.total_text)
             else :
                 raise BelugaValidationError("multi는 int, list[str], dict 형식이어야 합니다.")
 
@@ -733,8 +789,8 @@ class Beluga:
         qid: Optional[str] = None,
         cond: Optional[Union[str, list[str]]] = None,
         options: Union[dict, list[str]] = {},
-        rows: Union[dict, list[str]] = {},
-        row_cond: Optional[Union[str, int]] = None,
+        multi: Union[dict, list[str]] = {},
+        multi_cond: Optional[Union[str, int]] = None,
         duplicate: bool = False,
         fail: str = '',
         post_logic: str = '',
@@ -744,32 +800,23 @@ class Beluga:
         if not isinstance(options, (dict, list)) or len(options) == 0:
             raise BelugaValidationError("options는 빈 리스트가 아니어야 합니다.")
 
-        if not isinstance(rows, (dict, list)) or len(rows) == 0:
+        if not isinstance(multi, (dict, list)) or len(multi) == 0:
             raise BelugaValidationError("rows는 빈 리스트가 아니어야 합니다.")
 
         change_val = self.config.change if change is None else change
-        selects = set_dropdown(options=options, rows=rows, placeholder=self.dropdown_placeholder)
+        selects = set_dropdown(options=options, rows=multi, placeholder=self.dropdown_placeholder)
         title = f'{title}\n{selects}'
 
-        if row_cond is not None :
-            if isinstance(row_cond, str) :
-                base_qnum = self.df[self.df.QID == row_cond]['문항번호'].iloc[0]
-                if base_qnum is None :
-                    raise BelugaValidationError(f"row_cond에 해당하는 문항이 없습니다. {row_cond}")
-            elif isinstance(row_cond, int) :
-                base_qnum = row_cond
-            else :
-                raise BelugaValidationError("row_cond는 str 또는 int 형식이어야 합니다.")
-
-            row_cond_js = dropdown_row_cond.format(base=base_qnum)
-
+        if multi_cond is not None :
+            chk_multi = self._check_multi_cond(multi_cond)
+            multi_cond_js = chk_multi['js']
             if cond is not None :
                 if isinstance(cond, list) :
-                    cond.append(row_cond_js)
+                    cond.append(multi_cond_js)
                 else :
-                    cond += f' && {row_cond_js}'
+                    cond += f' && {multi_cond_js}'
             else :
-                cond = row_cond_js
+                cond = multi_cond_js
 
         js = dropdown_js.format(duplicate= 'true' if duplicate else 'false')
         if cond is not None :
@@ -839,6 +886,65 @@ class Beluga:
             pd.DataFrame: 추가된 문항의 DataFrame
         """
 
+        if piping is not None :
+            if na != '' and na is not None :
+                caution_message(f"`없음`의 경우 임포트할 때 파이핑하는 문항의 없음 보기 라벨이 됩니다. (벨루가 에디터에서 수정 필요)")
+
+            base = None
+            if isinstance(piping, BelugaQuestion) :
+                base = piping
+            elif isinstance(piping, int) :
+                base = [q for q in self.questions if q.qnum == piping][0]
+            elif isinstance(piping, str) :
+                base = getattr(self, piping)
+
+            if base is None :
+                raise BelugaValidationError(f"piping에 해당하는 문항이 없습니다. {piping}")
+
+
+            if len(options) == 0 or options is None :
+                options = base.options
+
+                if base.etc :
+                    etc = True
+
+                piping = f'Q{base.qnum}'
+
+                if not selected_piping :
+                    piping = f'!{piping}'
+            else :
+                if len(base.options) == len(options) :
+                    piping = ''
+                    must_show = []
+                    if etc :
+                        must_show.append(len(base.options)+1)
+
+                    if na != '' and na is not None :
+                        must_show.append(-1)
+
+                    extra_js = ''
+                    if len(must_show) > 0 :
+                        extra_js = f'showOption(cur, {must_show});'
+
+                    piping_cond = ''
+                    if selected_piping :
+                        piping_cond = piping_js.format(base=base.qnum, extra=extra_js)
+                    else :
+                        piping_cond = rv_piping_js.format(base=base.qnum, extra=extra_js)
+
+
+                    if cond is not None :
+                        if isinstance(cond, list) :
+                            cond.append(piping_cond)
+                        else :
+                            cond = f'{cond} && {piping_cond}'
+                    else :
+                        cond = piping_cond
+                else :
+                    raise BelugaValidationError(f"파이핑하는 문항의 보기 개수가 다릅니다. {base.qnum}번 문항: {len(base.options)}개, {qid}번 문항: {len(options)}개")
+        else :
+            piping = ''
+
         if isinstance(options, (list, dict)) :
             check_group = group_rot(options)
             if check_group is not None :
@@ -890,21 +996,6 @@ class Beluga:
         else:
             cond = ''
 
-        if piping is not None :
-            if isinstance(piping, BelugaQuestion) :
-                piping = f'Q{piping.qnum}'
-            elif isinstance(piping, int) :
-                piping = f'Q{piping}'
-            elif isinstance(piping, str) :
-                qnum = self.df[self.df.QID == piping]['문항번호'].iloc[0]
-                if qnum is None :
-                    raise BelugaValidationError(f"piping에 해당하는 문항이 없습니다. {piping}")
-                piping = f'Q{qnum}'
-
-            if not selected_piping :
-                piping = f'!{piping}'
-        else :
-            piping = ''
 
         if isinstance(options, (list, dict)) :
             options = self._format_options(options, na, etc_text)
@@ -962,6 +1053,7 @@ class Beluga:
                     post_text=post_text,
                 )
                 setattr(self, qid, question)
+                self.questions.append(question)
         else :
             qnum = len(self.df.index)
             qid = f'Q{qnum}'
@@ -986,7 +1078,7 @@ class Beluga:
             )
 
             setattr(self, qid, question)
-
+            self.questions.append(question)
         if self.config.display:
             preview_question(question)
 

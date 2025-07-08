@@ -452,3 +452,10 @@ def preview_question(question: BelugaQuestion):
     </div>
     """
     display(HTML(html))
+
+
+def caution_message(message: str):
+    html = f"""
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 12px 16px; margin: 10px 0; box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);"><span style="color: #856404; font-size: 14px; font-weight: 500; line-height: 1.4; display: flex; align-items: center;"><span style="margin-right: 8px; font-size: 16px;">⚠️</span>{message}</span></div>
+    """
+    display(HTML(html))

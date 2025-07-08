@@ -1069,3 +1069,19 @@ window.topPosition = (appendCodes = [], qnum = null) => {
   }
 };'''
 }
+
+
+piping_js = '''(()=>{{
+    hideOption(cur);
+    showOption(cur, getAnswerSet({base}).answers.map(ans => ans.value.order));
+    {extra}
+    return true;
+}})()'''
+
+
+rv_piping_js = '''(()=>{{
+    showOption(cur);
+    hideOption(cur, getAnswerSet({base}).answers.map(ans => ans.value.order));
+    {extra}
+    return true;
+}})()'''
