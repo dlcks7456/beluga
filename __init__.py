@@ -801,7 +801,7 @@ class Beluga:
             raise BelugaValidationError("options는 빈 리스트가 아니어야 합니다.")
 
         if not isinstance(multi, (dict, list)) or len(multi) == 0:
-            raise BelugaValidationError("rows는 빈 리스트가 아니어야 합니다.")
+            raise BelugaValidationError("multi는 빈 리스트가 아니어야 합니다.")
 
         change_val = self.config.change if change is None else change
         selects = set_dropdown(options=options, rows=multi, placeholder=self.dropdown_placeholder)

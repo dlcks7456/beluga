@@ -23,11 +23,11 @@ pip install git+https://github.com/dlcks7456/beluga
 from beluga import Beluga, BelugaConfig
 
 # 기본 인스턴스 생성
-beluga = Beluga()
+bl = Beluga()
 
 # 설정과 함께 인스턴스 생성
 config = BelugaConfig(etc_text="기타", default_rotation=True)
-beluga = Beluga(config)
+bl = Beluga(config)
 ```
 
 ## 기본 설정
@@ -48,7 +48,7 @@ config = BelugaConfig(
 ### 기타 텍스트 변경
 
 ```python
-beluga.set_etc_text("사용자 정의 기타 텍스트")
+bl.set_etc_text("사용자 정의 기타 텍스트")
 ```
 
 ## 문항 유형별 메서드
@@ -79,14 +79,14 @@ beluga.set_etc_text("사용자 정의 기타 텍스트")
 
 ```python
 # 기본 단일 선택
-beluga.sa(
+bl.sa(
     title="성별을 선택해주세요",
     options=["남성", "여성"],
     qid="Q1"
 )
 
 # 기타 선택지 포함
-beluga.sa(
+bl.sa(
     title="선호하는 색상을 선택해주세요",
     options=["빨강", "파랑", "노랑"],
     etc=True,
@@ -94,14 +94,14 @@ beluga.sa(
 )
 
 # 딕셔너리 형태 선택지
-beluga.sa(
+bl.sa(
     title="연령대를 선택해주세요",
     options={1: "10대", 2: "20대", 3: "30대", 4: "40대 이상"},
     qid="Q3"
 )
 
 # 척도형 문항
-beluga.sa(
+bl.sa(
     title="만족도를 평가해주세요",
     options=["매우 불만족", "불만족", "보통", "만족", "매우 만족"],
     scale=True,
@@ -109,7 +109,7 @@ beluga.sa(
 )
 
 # 조건부 문항
-beluga.sa(
+bl.sa(
     title="추가 질문입니다",
     options=["예", "아니오"],
     cond="Q1A1",  # Q1이 1번 선택시에만 표시
@@ -144,7 +144,7 @@ beluga.sa(
 
 ```python
 # 기본 다중 선택
-beluga.ma(
+bl.ma(
     title="관심 있는 분야를 선택해주세요 (복수 선택 가능)",
     options=["프로그래밍", "데이터 분석", "머신러닝", "웹 개발"],
     min=1,
@@ -153,7 +153,7 @@ beluga.ma(
 )
 
 # 기타 선택지 포함
-beluga.ma(
+bl.ma(
     title="사용하는 프로그래밍 언어를 모두 선택해주세요",
     options=["Python", "Java", "JavaScript", "C++"],
     etc=True,
@@ -161,7 +161,7 @@ beluga.ma(
 )
 
 # 로테이션 적용
-beluga.ma(
+bl.ma(
     title="선호하는 브랜드를 선택해주세요",
     options=["브랜드A", "브랜드B", "브랜드C", "브랜드D"],
     rotation=True,
@@ -179,7 +179,7 @@ beluga.ma(
 
 ```python
 # 순위 선택
-beluga.rank(
+bl.rank(
     title="다음 중 중요한 순서대로 최대 3개를 선택해주세요",
     options=["가격", "품질", "디자인", "브랜드", "기능"],
     min=1,
@@ -210,7 +210,7 @@ beluga.rank(
 
 ```python
 # 5점 척도
-beluga.scale(
+bl.scale(
     title="이 제품에 대한 만족도를 평가해주세요",
     left="매우 불만족",
     right="매우 만족",
@@ -219,7 +219,7 @@ beluga.scale(
 )
 
 # 7점 척도 (중간 라벨 포함)
-beluga.scale(
+bl.scale(
     title="서비스 품질을 평가해주세요",
     left="매우 나쁨",
     center="보통",
@@ -229,7 +229,7 @@ beluga.scale(
 )
 
 # 10점 척도
-beluga.scale(
+bl.scale(
     title="추천 의향을 평가해주세요",
     left="전혀 추천하지 않음",
     right="매우 추천함",
@@ -260,13 +260,13 @@ beluga.scale(
 
 ```python
 # 단일 텍스트 입력
-beluga.text(
+bl.text(
     title="추가 의견을 자유롭게 작성해주세요",
     qid="Q13"
 )
 
 # 다중 텍스트 입력 (개수 지정)
-beluga.text(
+bl.text(
     title="좋아하는 음식 3가지를 작성해주세요",
     multi=3,
     multi_atleast=True,
@@ -274,14 +274,14 @@ beluga.text(
 )
 
 # 다중 텍스트 입력 (라벨 지정)
-beluga.text(
+bl.text(
     title="개인 정보를 입력해주세요",
     multi=["이름", "나이", "직업"],
     qid="Q15"
 )
 
 # 다중 텍스트 입력 (딕셔너리 형태)
-beluga.text(
+bl.text(
     title="연락처 정보를 입력해주세요",
     multi={1: "이메일", 2: "전화번호", 3: "주소"},
     multi_width="300px",
@@ -314,7 +314,7 @@ beluga.text(
 
 ```python
 # 단일 숫자 입력
-beluga.number(
+bl.number(
     title="나이를 입력해주세요",
     min=0,
     max=100,
@@ -323,7 +323,7 @@ beluga.number(
 )
 
 # 다중 숫자 입력 (총합 제한)
-beluga.number(
+bl.number(
     title="각 항목의 중요도를 100점 만점으로 배분해주세요",
     multi=["가격", "품질", "디자인"],
     total=100,
@@ -351,7 +351,7 @@ beluga.number(
 **사용 예시:**
 
 ```python
-beluga.date(
+bl.date(
     title="생년월일을 입력해주세요",
     qid="Q20"
 )
@@ -366,7 +366,7 @@ beluga.date(
 **사용 예시:**
 
 ```python
-beluga.phone(
+bl.phone(
     title="연락처를 입력해주세요",
     qid="Q21"
 )
@@ -381,7 +381,7 @@ beluga.phone(
 **사용 예시:**
 
 ```python
-beluga.address(
+bl.address(
     title="주소를 입력해주세요",
     qid="Q22"
 )
@@ -396,7 +396,7 @@ beluga.address(
 **사용 예시:**
 
 ```python
-beluga.image(
+bl.image(
     title="증빙 서류를 업로드해주세요",
     qid="Q23"
 )
@@ -412,7 +412,7 @@ beluga.image(
 - `qid` (str, 선택): 질문 ID
 - `cond` (str|list, 선택): 조건문
 - `options` (dict|list, 필수): 드롭다운 선택지
-- `rows` (dict|list, 필수): 행 목록
+- `multi` (dict|list, 필수): 행 목록
 - `row_cond` (str|int, 선택): 행 조건
 - `duplicate` (bool, 선택): 중복 응답 제한 여부 (기본: False)
 - `fail` (str, 선택): 조건 실패시 이동할 위치
@@ -424,18 +424,18 @@ beluga.image(
 
 ```python
 # 기본 드롭다운
-beluga.dropdown(
+bl.dropdown(
     title="각 항목에 대한 만족도를 선택해주세요",
     options=["매우 불만족", "불만족", "보통", "만족", "매우 만족"],
-    rows=["가격", "품질", "서비스"],
+    multi=["가격", "품질", "서비스"],
     qid="Q24"
 )
 
 # 중복 응답 제한
-beluga.dropdown(
+bl.dropdown(
     title="선호도 순위를 선택해주세요",
     options=["1순위", "2순위", "3순위"],
-    rows=["상품A", "상품B", "상품C"],
+    multi=["상품A", "상품B", "상품C"],
     duplicate=True,
     qid="Q25"
 )
@@ -455,11 +455,11 @@ beluga.dropdown(
 
 ```python
 # 전체 문항 조회
-df = beluga.show_df()
+df = bl.show_df()
 print(df)
 
 # 특정 문항 조회
-df_q1 = beluga.show_df("Q1")
+df_q1 = bl.show_df("Q1")
 print(df_q1)
 ```
 
@@ -474,7 +474,7 @@ print(df_q1)
 **사용 예시:**
 
 ```python
-beluga.show_options("Q1")
+bl.show_options("Q1")
 ```
 
 ### to_excel() - Excel 파일 저장
@@ -488,7 +488,7 @@ beluga.show_options("Q1")
 **사용 예시:**
 
 ```python
-beluga.to_excel("survey_questions.xlsx")
+bl.to_excel("survey_questions.xlsx")
 ```
 
 ## 공통 파라미터
@@ -538,7 +538,7 @@ rotation=False  # 로테이션 미적용
 
 ```python
 # 메서드 체이닝
-beluga.sa(
+bl.sa(
     title="성별을 선택해주세요",
     options=["남성", "여성"],
     qid="Q1"
@@ -559,7 +559,7 @@ beluga.sa(
 
 ```python
 # 기존 문항 수정 (change=True)
-beluga.sa(
+bl.sa(
     title="수정된 성별 질문",
     options=["남성", "여성", "기타"],
     qid="Q1",
@@ -571,7 +571,7 @@ beluga.sa(
 
 ```python
 # 복잡한 조건부 로직
-beluga.sa(
+bl.sa(
     title="추가 질문",
     options=["예", "아니오"],
     cond="(Q1A1 || Q1A2) && Q2CNT > 3",
@@ -583,7 +583,7 @@ beluga.sa(
 
 ```python
 # 복잡한 다중 입력
-beluga.number(
+bl.number(
     title="월별 매출을 입력해주세요",
     multi={
         1: "1월", 2: "2월", 3: "3월",
@@ -613,13 +613,13 @@ from beluga import Beluga
 beluga = Beluga()
 
 # 기본 정보 수집
-beluga.sa(
+bl.sa(
     title="성별을 선택해주세요",
     options=["남성", "여성"],
     qid="GENDER"
 )
 
-beluga.number(
+bl.number(
     title="나이를 입력해주세요",
     min=0,
     max=120,
@@ -628,7 +628,7 @@ beluga.number(
 )
 
 # 만족도 조사
-beluga.scale(
+bl.scale(
     title="전반적인 만족도를 평가해주세요",
     left="매우 불만족",
     right="매우 만족",
@@ -637,14 +637,14 @@ beluga.scale(
 )
 
 # 조건부 문항
-beluga.text(
+bl.text(
     title="불만족 사유를 작성해주세요",
     cond="Q#[SATISFACTION] <= 2",
     qid="DISSATISFACTION_REASON"
 )
 
 # 다중 선택
-beluga.ma(
+bl.ma(
     title="개선이 필요한 부분을 선택해주세요 (복수 선택)",
     options=["가격", "품질", "서비스", "배송"],
     etc=True,
@@ -654,16 +654,16 @@ beluga.ma(
 )
 
 # 최종 의견
-beluga.text(
+bl.text(
     title="추가 의견이 있으시면 자유롭게 작성해주세요",
     qid="ADDITIONAL_COMMENTS"
 )
 
 # Excel 파일로 저장
-beluga.to_excel("complete_survey.xlsx")
+bl.to_excel("complete_survey.xlsx")
 
 # 생성된 문항 확인
-print(beluga.show_df())
+print(bl.show_df())
 ```
 
 ## QID 참조 기능 (extract_qids)
@@ -682,13 +682,13 @@ Beluga 라이브러리는 `title`과 `cond` 파라미터에서 `#[QID]` 패턴�
 
 ```python
 # 기본 문항들 생성
-beluga.sa(
+bl.sa(
     title="성별을 선택해주세요",
     options=["남성", "여성"],
     qid="GENDER"
 )
 
-beluga.scale(
+bl.scale(
     title="만족도를 평가해주세요",
     left="매우 불만족",
     right="매우 만족",
@@ -697,7 +697,7 @@ beluga.scale(
 )
 
 # QID 참조를 사용한 조건부 문항
-beluga.text(
+bl.text(
     title="불만족 사유를 작성해주세요",
     cond="Q#[SATISFACTION] <= 2",  # SATISFACTION 문항의 번호로 자동 치환
     qid="DISSATISFACTION_REASON"
@@ -708,7 +708,7 @@ beluga.text(
 
 ```python
 # 이전 응답을 참조하는 문항
-beluga.sa(
+bl.sa(
     title="앞서 #[GENDER] 번 문항에서 선택하신 성별에 따른 추가 질문입니다",
     options=["예", "아니오"],
     qid="GENDER_FOLLOW_UP"
@@ -718,7 +718,7 @@ beluga.sa(
 #### 3. 복합 조건에서 QID 참조
 
 ```python
-beluga.ma(
+bl.ma(
     title="개선 사항을 선택해주세요",
     options=["가격", "품질", "서비스", "배송"],
     cond="Q#[SATISFACTION] <= 3 && Q#[GENDER] == 1",  # 만족도 3점 이하이고 성별이 남성인 경우
@@ -729,7 +729,7 @@ beluga.ma(
 #### 4. 다중 QID 참조
 
 ```python
-beluga.text(
+bl.text(
     title="#[GENDER] 번과 #[SATISFACTION] 번 문항을 참고하여 의견을 작성해주세요",
     cond="Q#[GENDER] == 1 || Q#[SATISFACTION] >= 4",
     qid="DETAILED_FEEDBACK"
@@ -746,7 +746,7 @@ beluga.text(
 
 ```python
 # 작성한 코드
-beluga.text(
+bl.text(
     title="앞서 #[GENDER] 번 문항에서 응답하신 내용을 바탕으로 답변해주세요",
     cond="Q#[SATISFACTION] <= 2 && Q#[AGE] >= 30",
     qid="FOLLOW_UP"
@@ -772,13 +772,13 @@ from beluga import Beluga
 beluga = Beluga()
 
 # 기본 정보 수집
-beluga.sa(
+bl.sa(
     title="성별을 선택해주세요",
     options=["남성", "여성"],
     qid="GENDER"
 )
 
-beluga.number(
+bl.number(
     title="나이를 입력해주세요",
     min=0,
     max=100,
@@ -786,7 +786,7 @@ beluga.number(
     qid="AGE"
 )
 
-beluga.scale(
+bl.scale(
     title="서비스 만족도를 평가해주세요",
     left="매우 불만족",
     right="매우 만족",
@@ -795,13 +795,13 @@ beluga.scale(
 )
 
 # QID 참조를 활용한 조건부 문항들
-beluga.text(
+bl.text(
     title="#[GENDER] 번 문항에서 선택하신 성별을 고려한 추가 의견을 작성해주세요",
     cond="Q#[AGE] >= 20",  # 20세 이상만 표시
     qid="GENDER_SPECIFIC_FEEDBACK"
 )
 
-beluga.ma(
+bl.ma(
     title="만족도가 낮은 이유를 선택해주세요 (복수 선택)",
     options=["가격", "품질", "서비스", "접근성"],
     cond="Q#[SERVICE_SATISFACTION] <= 2",  # 만족도 2점 이하만 표시
@@ -810,21 +810,21 @@ beluga.ma(
     qid="DISSATISFACTION_REASONS"
 )
 
-beluga.text(
+bl.text(
     title="#[SERVICE_SATISFACTION] 번 문항에서 평가하신 점수에 대한 구체적인 이유를 작성해주세요",
     cond="Q#[SERVICE_SATISFACTION] <= 2 || Q#[SERVICE_SATISFACTION] >= 4",  # 극값인 경우만 표시
     qid="DETAILED_SATISFACTION_REASON"
 )
 
 # 연령대별 맞춤 문항
-beluga.sa(
+bl.sa(
     title="#[AGE] 번 문항에서 입력하신 연령대에 적합한 서비스 개선 방향을 선택해주세요",
     options=["모바일 최적화", "사용성 개선", "고객 지원 강화", "가격 정책 개선"],
     cond="Q#[AGE] >= 18",  # 성인만 표시
     qid="AGE_SPECIFIC_IMPROVEMENT"
 )
 
-beluga.to_excel("survey_with_qid_references.xlsx")
+bl.to_excel("survey_with_qid_references.xlsx")
 ```
 
 ### 주의사항
