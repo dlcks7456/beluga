@@ -9,6 +9,7 @@ from .utils.jsLogic import *
 from .utils import *
 from .belugaQuestion import *
 from .previewQuestion import *
+from typing import Dict
 
 def create_question_df() :
     """설문 문항을 저장할 DataFrame을 생성합니다."""
@@ -32,13 +33,31 @@ def create_question_df() :
 
 class BelugaConfig:
     """Beluga 클래스의 설정을 관리하는 클래스입니다."""
-    def __init__(self, etc_text: str = '기타(직접 입력)', default_rotation: bool = False, dropdown_placeholder: str = '하나 선택...', total_text: str = '합계', display: bool = True, change: bool = True):
+    def __init__(self, etc_text: str = '기타(직접 입력)', default_rotation: bool = False, dropdown_placeholder: str = '하나 선택...', total_text: str = '합계', display: bool = True, change: bool = True, text_atleast_error: Dict[str, str] = None, text_all_error: Dict[str, str] = None, num_error: Dict[str, str] = None, dropdown_error: Dict[str, str] = None):
         self.etc_text = etc_text
         self.dropdown_placeholder = dropdown_placeholder
         self.total_text = total_text
         self.default_rotation = default_rotation
         self.display = display
         self.change = change
+        self.text_atleast_error = text_atleast_error or {
+            'empty': '첫번째 칸은 반드시 입력해주세요.',
+            'outOfOrder': '입력 칸을 순서대로 사용해주세요.',
+            'duplicate': '중복된 응답이 있습니다.',
+        }
+        self.text_all_error = text_all_error or {
+            'empty': '빈 칸 없이 응답을 입력해 주세요.',
+            'duplicate': '중복된 응답이 있습니다.',
+        }
+        self.num_error = num_error or {
+            'empty': '모든 항목을 입력해주세요.',
+            'range': '${min}~${max} 사이의 값을 입력해주세요.',
+            'total': '총합이 ${total}이 되어야 합니다.',
+        }
+        self.dropdown_error = dropdown_error or {
+            'empty': '모든 항목을 응답해주세요.',
+            'duplicate': '중복된 항목이 있습니다.',
+        }
 
 class BelugaValidationError(Exception):
     """Beluga 클래스 검증 에러"""
@@ -446,9 +465,9 @@ class Beluga:
             js = None
 
             if multi_atleast :
-                js = multi_text_atleast_js
+                js = multi_text_atleast_js.format(text_atleast_error=self.config.text_atleast_error)
             else :
-                js = multi_text_all_js
+                js = multi_text_all_js.format(text_all_error=self.config.text_all_error)
             if cond is not None :
                 if isinstance(cond, list) :
                     cond.append(js)
@@ -653,7 +672,7 @@ class Beluga:
 
             title = f'{title}\n{multi_html}'
 
-            js = multi_num_js.format(min=min, max=max, total=total if total is not None else 'null')
+            js = multi_num_js.format(min=min, max=max, total=total if total is not None else 'null', num_error=self.config.num_error)
 
             if cond is not None :
                 if isinstance(cond, list) :
@@ -810,7 +829,7 @@ class Beluga:
             else :
                 cond = multi_cond_js
 
-        js = dropdown_js.format(duplicate= 'true' if duplicate else 'false')
+        js = dropdown_js.format(duplicate= 'true' if duplicate else 'false', dropdown_error=self.config.dropdown_error)
         if cond is not None :
             if isinstance(cond, list) :
                 cond.append(js)

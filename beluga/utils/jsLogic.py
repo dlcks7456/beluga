@@ -1,13 +1,9 @@
 from typing import Union, Optional
 
-multi_text_atleast_js = '''(() => {
-  const errorMessages = {
-    empty: '첫번째 칸은 반드시 입력해주세요.',
-    outOfOrder: '입력 칸을 순서대로 사용해주세요.',
-    duplicate: '중복된 응답이 있습니다.',
-  };
+multi_text_atleast_js = '''(() => {{
+  const errorMessages = {text_atleast_error};
 
-  const question = $(`#survey${cur}`);
+  const question = $(`#survey${{cur}}`);
   const nextBtn = question.find('.next-btn-wrapper');
   question.find('.answer').hide();
   nextBtn.attr('onclick', null);
@@ -17,57 +13,56 @@ multi_text_atleast_js = '''(() => {
 
   const inputs = question.find(`.multi input`);
 
-  inputs.off('keyup change').on('keyup change', (e) => {
+  inputs.off('keyup change').on('keyup change', (e) => {{
     const index = inputs.index(e.currentTarget);
     const prevInputs = inputs.slice(0, index);
 
     const hasEmptyPrev = [...prevInputs].some((input) => input.value.trim() === '');
 
-    if (hasEmptyPrev) {
+    if (hasEmptyPrev) {{
       e.currentTarget.value = '';
-      if (index > 0) {
+      if (index > 0) {{
         const emptyInputs = [...prevInputs].findIndex(input => input.value.trim() === '');
-        if (emptyInputs !== -1) {
+        if (emptyInputs !== -1) {{
           inputs.eq(emptyInputs).focus();
-        } else {
+        }} else {{
           inputs.eq(index - 1).focus();
-        }
-      }
+        }}
+      }}
 
       alert(errorMessages.outOfOrder);
-    }
-  });
+    }}
+  }});
 
-  nextBtn.click(() => {
+  nextBtn.click(() => {{
     const inputs = question.find(`.multi input`);
-    if (inputs.eq(0).val().trim() === '') {
+    if (inputs.eq(0).val().trim() === '') {{
       alert(errorMessages.empty);
       inputs.eq(0).focus();
       return;
-    }
+    }}
 
     const values = [...inputs].filter((e) => e.value.trim() !== '').map((e) => e.value);
-    if (new Set(values).size !== values.length) {
+    if (new Set(values).size !== values.length) {{
       alert(errorMessages.duplicate);
       return;
-    }
+    }}
 
-    const answer = rawIndex.map((e) => $(`#survey${cur} #x${e}`).val()).join('|');
-    $(`#answer${cur}`).val(answer);
+    const answer = rawIndex.map((e) => $(`#survey${{cur}} #x${{e}}`).val()).join('|');
+    $(`#answer${{cur}}`).val(answer);
     goNext();
-  });
+  }});
 
   return true;
-})()'''
+}})()'''
 
 
-multi_text_all_js = '''(() => {
-  const errorMessages = {
-    empty: '빈 칸 없이 응답을 입력해 주세요.',
-    duplicate: '중복된 응답이 있습니다.',
-  };
 
-  const question = $(`#survey${cur}`);
+
+multi_text_all_js = '''(() => {{
+  const errorMessages = {text_all_error};
+
+  const question = $(`#survey${{cur}}`);
   const nextBtn = question.find('.next-btn-wrapper');
   question.find('.answer').hide();
   nextBtn.attr('onclick', null);
@@ -75,26 +70,28 @@ multi_text_all_js = '''(() => {
   const raw = question.find(`.multi input`);
   const rawIndex = [...raw].map((e) => Number(e.id.replace('x', ''))).sort((a, b) => a - b);
 
-  nextBtn.click(() => {
+  nextBtn.click(() => {{
     const inputs = [...question.find(`.multi input`)].filter((input) => !input.disabled);
-    if ([...inputs].some((e) => e.value.trim() === '')) {
+    if ([...inputs].some((e) => e.value.trim() === '')) {{
       alert(errorMessages.empty);
       return;
-    }
+    }}
 
     const values = [...inputs].map((e) => e.value);
-    if (new Set(values).size !== values.length) {
+    if (new Set(values).size !== values.length) {{
       alert(errorMessages.duplicate);
       return;
-    }
+    }}
 
-    const answer = rawIndex.map((e) => $(`#survey${cur} #x${e}`).val()).join('|');
-    $(`#answer${cur}`).val(answer);
+    const answer = rawIndex.map((e) => $(`#survey${{cur}} #x${{e}}`).val()).join('|');
+    $(`#answer${{cur}}`).val(answer);
     goNext();
-  });
+  }});
 
   return true;
-})()'''
+}})()'''
+
+
 
 
 multi_num_js = '''(() => {{
@@ -102,11 +99,7 @@ multi_num_js = '''(() => {{
   let max = {max};
   let total = {total};
 
-  const errorMessages = {{
-    empty: '모든 항목을 입력해주세요.',
-    range: `${{min}}~${{max}} 사이의 값을 입력해주세요.`,
-    total: `총합이 ${{total}}이 되어야 합니다.`,
-  }};
+  const errorMessages = {num_error};
 
   const question = $(`#survey${{cur}}`);
   const nextBtn = question.find('.next-btn-wrapper');
@@ -158,10 +151,7 @@ multi_num_js = '''(() => {{
 
 dropdown_js = '''(() => {{
   const duplicateCheck = {duplicate};
-  const errorMessages = {{
-    empty: '모든 항목을 응답해주세요.',
-    duplicate: '중복된 항목이 있습니다.',
-  }};
+  const errorMessages = {dropdown_error};
   const question = $(`#survey${{cur}}`);
   const nextBtn = question.find('.next-btn-wrapper');
   question.find('.answer').hide();
