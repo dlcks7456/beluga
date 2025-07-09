@@ -877,6 +877,7 @@ class Beluga:
         Returns:
             pd.DataFrame: 추가된 문항의 DataFrame
         """
+        origin_options = options
 
         if piping is not None :
             if na != '' and na is not None :
@@ -1021,9 +1022,7 @@ class Beluga:
 
         if qtype in ['객관식 중복', '객관식 순위'] :
             if max is None :
-                max = len(options)
-                if etc :
-                    max += 1
+                max = len(origin_options)
 
         # Attributes
         if qid is not None :
