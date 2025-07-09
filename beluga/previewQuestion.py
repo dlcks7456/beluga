@@ -47,7 +47,7 @@ def preview_question(question: BelugaQuestion):
         logic_accordion = f"""<div class='b-logic-accordion' id='b-logic-acc' style='display:none;'><pre class='b-logic-code'><code class='language-javascript'>{question.cond.strip()}</code></pre></div>"""
 
     # qid 뱃지
-    qid_badge = f"<span class='b-qid-badge'>{question.qid}</span>"
+    qid_badge = f"<span class='b-qid-badge'>{question.qid} [Q{question.qnum}]</span>"
     type_badge = f"<span class='b-type-badge'>{question.type}</span>"
 
     style_id = "beluga-survey-preview-style"
