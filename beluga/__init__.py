@@ -1012,6 +1012,10 @@ class Beluga:
         if cond:
             cond = cond.strip()
 
+        if qtype in ['객관식 중복', '객관식 순위'] :
+            if max is None :
+                max = len(origin_options)
+
         if inplace:
             self._append_inplace(
                 qtype, title, options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, change, etc_text
@@ -1020,10 +1024,6 @@ class Beluga:
             self._create_dummy_df(
                 qtype, title, options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, etc_text
             )
-
-        if qtype in ['객관식 중복', '객관식 순위'] :
-            if max is None :
-                max = len(origin_options)
 
         # Attributes
         if qid is not None :
