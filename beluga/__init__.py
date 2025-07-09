@@ -877,7 +877,6 @@ class Beluga:
         Returns:
             pd.DataFrame: 추가된 문항의 DataFrame
         """
-        origin_options = options
 
         if piping is not None :
             if na != '' and na is not None :
@@ -937,6 +936,8 @@ class Beluga:
                     raise BelugaValidationError(f"파이핑하는 문항의 보기 개수가 다릅니다. {base.qnum}번 문항: {len(base.options)}개, {qid}번 문항: {len(options)}개")
         else :
             piping = ''
+
+        origin_options = options
 
         if isinstance(options, (list, dict)) :
             check_group = group_rot(options)
