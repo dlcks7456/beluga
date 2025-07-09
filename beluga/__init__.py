@@ -665,6 +665,7 @@ class Beluga:
             raise BelugaValidationError("multi 형태로 변경 필요")
 
         if multi is not None :
+            qtype = '주관식 문자'
             if isinstance(multi, (int, list, dict)) :
                 multi_html = set_multi_input(n=multi, type='number', post_text=post_text, width=multi_width, total=total is not None, total_label=self.total_text)
             else :
