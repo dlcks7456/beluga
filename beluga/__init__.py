@@ -275,10 +275,6 @@ class Beluga:
         change_val = self.config.change if change is None else change
         self._validate_question(qid, title, min, max, change_val)
 
-        if max is None :
-            max = len(options)
-            if etc :
-                max += 1
 
         return self.append_question(
             qid=qid,
@@ -347,10 +343,6 @@ class Beluga:
         change_val = self.config.change if change is None else change
         self._validate_question(qid, title, min, max, change_val)
 
-        if max is None :
-            max = len(options)
-            if etc :
-                max += 1
 
         return self.append_question(
             qid=qid,
@@ -1026,6 +1018,12 @@ class Beluga:
             self._create_dummy_df(
                 qtype, title, options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, etc_text
             )
+
+        if qtype in ['객관식 중복', '객관식 순위'] :
+            if max is None :
+                max = len(options)
+                if etc :
+                    max += 1
 
         # Attributes
         if qid is not None :
