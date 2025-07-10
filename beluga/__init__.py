@@ -32,7 +32,7 @@ def create_question_df() :
 
 
 def dict_to_str(d: dict) -> str:
-    dict_str = '\n'.join([f'\t{k}: `{v}`' for k, v in d.items()])
+    dict_str = ',\n'.join([f'\t{k}: `{v}`' for k, v in d.items()])
     return f'{{\n{dict_str}\n\t}}'
 
 class BelugaConfig:
