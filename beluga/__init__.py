@@ -31,6 +31,10 @@ def create_question_df() :
         ])
 
 
+def dict_to_str(d: dict) -> str:
+    dict_str = '\n'.join([f'\t{k}: `{v}`' for k, v in d.items()])
+    return f'{{\n{dict_str}\n\t}}'
+
 class BelugaConfig:
     """Beluga 클래스의 설정을 관리하는 클래스입니다."""
     def __init__(self, etc_text: str = '기타(직접 입력)', default_rotation: bool = False, dropdown_placeholder: str = '하나 선택...', total_text: str = '합계', display: bool = True, change: bool = True, text_atleast_error: Dict[str, str] = None, text_all_error: Dict[str, str] = None, num_error: Dict[str, str] = None, dropdown_error: Dict[str, str] = None):
@@ -465,9 +469,9 @@ class Beluga:
             js = None
 
             if multi_atleast :
-                js = multi_text_atleast_js.format(text_atleast_error=self.config.text_atleast_error)
+                js = multi_text_atleast_js.format(text_atleast_error=dict_to_str(self.config.text_atleast_error))
             else :
-                js = multi_text_all_js.format(text_all_error=self.config.text_all_error)
+                js = multi_text_all_js.format(text_all_error=dict_to_str(self.config.text_all_error))
             if cond is not None :
                 if isinstance(cond, list) :
                     cond.append(js)
@@ -673,7 +677,7 @@ class Beluga:
 
             title = f'{title}\n{multi_html}'
 
-            js = multi_num_js.format(min=min, max=max, total=total if total is not None else 'null', num_error=self.config.num_error)
+            js = multi_num_js.format(min=min, max=max, total=total if total is not None else 'null', num_error=dict_to_str(self.config.num_error))
 
             if cond is not None :
                 if isinstance(cond, list) :
@@ -830,7 +834,7 @@ class Beluga:
             else :
                 cond = multi_cond_js
 
-        js = dropdown_js.format(duplicate= 'true' if duplicate else 'false', dropdown_error=self.config.dropdown_error)
+        js = dropdown_js.format(duplicate= 'true' if duplicate else 'false', dropdown_error=dict_to_str(self.config.dropdown_error))
         if cond is not None :
             if isinstance(cond, list) :
                 cond.append(js)
