@@ -1022,14 +1022,16 @@ class Beluga:
             cond = cond.strip()
 
 
-        for text, var_name in [(title, 'title'), (cond, 'cond')]:
+        for text, var_name in [(title, 'title'), (cond, 'cond'), (post_logic, 'post_logic')]:
             for match in extract_qids(text):
                 qnum_ref = self.df[self.df.QID == match]['문항번호'].iloc[0]
                 if qnum_ref is not None:
                     if var_name == 'title':
                         title = title.replace(f'#[{match}]', str(qnum_ref))
-                    else:
+                    elif var_name == 'cond':
                         cond = cond.replace(f'#[{match}]', str(qnum_ref))
+                    elif var_name == 'post_logic':
+                        post_logic = post_logic.replace(f'#[{match}]', str(qnum_ref))
 
 
         title = title.strip()
