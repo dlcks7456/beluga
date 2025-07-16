@@ -969,9 +969,11 @@ class Beluga:
                 rotation = True
                 if cond is not None :
                     if isinstance(cond, list) :
-                        cond.append(check_group)
+                        if not any('shuffleby' in c.lower() for c in cond) :
+                            cond.append(check_group)
                     else :
-                        cond = f'{cond} && {check_group}'
+                        if not 'shuffleby' in cond.lower() :
+                            cond = f'{cond} && {check_group}'
                 else :
                     cond = check_group
 
