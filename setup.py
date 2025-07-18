@@ -10,7 +10,7 @@ setup(
     name="beluga",
     version="0.1.0",
     author="Chuck (Chan.Lee)",
-    author_email="",
+    author_email="dlcks7456@kakao.com",
     description="설문 문항을 생성하고 관리하는 Python 라이브러리",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -37,6 +37,11 @@ setup(
             "pytest-cov>=2.0",
             "black>=21.0",
             "flake8>=3.8",
+        ],
+    },
+    entry_points={
+        "console_scripts": [
+            "beluga=beluga.cli:main",
         ],
     },
     include_package_data=True,

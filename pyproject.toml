@@ -42,6 +42,9 @@ dev = [
     "flake8>=3.8",
 ]
 
+[project.scripts]
+beluga = "beluga.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/dlcks7456/beluga"
 Repository = "https://github.com/dlcks7456/beluga"
