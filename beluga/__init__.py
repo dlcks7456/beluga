@@ -1,5 +1,5 @@
 __version__ = "0.1.0"
-# Chuck
+
 import pandas as pd
 from openpyxl import Workbook, load_workbook
 from openpyxl.utils import get_column_letter
@@ -910,7 +910,7 @@ class Beluga:
         Returns:
             pd.DataFrame: 추가된 문항의 DataFrame
         """
-
+        options = options.copy()
         if piping is not None :
             if na != '' and na is not None :
                 caution_message(f"`없음`의 경우 임포트할 때 파이핑하는 문항의 없음 보기 라벨이 됩니다. (벨루가 에디터에서 수정 필요)")
@@ -1009,13 +1009,13 @@ class Beluga:
 
                 elif isinstance(options, dict) :
                     # Flatten nested dicts
-                    flattened = {}
+                    flattened_dict = {}
                     for key, value in options.items():
                         if isinstance(value, dict):
-                            flattened.update(value)
+                            flattened_dict.update(value)
                         else:
-                            flattened[key] = value
-                    options = flattened
+                            flattened_dict[key] = value
+                    options = flattened_dict
 
 
         if etc :
