@@ -203,6 +203,7 @@ class Beluga:
         post_logic: str = '',
         change: Optional[bool] = None,
         inplace: bool = True,
+        group_config: Optional[dict] = None,
     ) -> 'Beluga' :
         """
         단일 선택 객관식 문항을 추가합니다.
@@ -249,7 +250,8 @@ class Beluga:
             fail=fail,
             post_logic=post_logic,
             change=change_val,
-            inplace=inplace
+            inplace=inplace,
+            group_config=group_config
         )
 
     def ma(
@@ -270,6 +272,7 @@ class Beluga:
         post_logic: str = '',
         change: Optional[bool] = None,
         inplace: bool = True,
+        group_config: Optional[dict] = None,
     ) -> 'Beluga':
         """
         다중 선택 객관식 문항을 추가합니다.
@@ -316,7 +319,8 @@ class Beluga:
             fail=fail,
             post_logic=post_logic,
             change=change_val,
-            inplace=inplace
+            inplace=inplace,
+            group_config=group_config
         )
 
 
@@ -338,6 +342,7 @@ class Beluga:
         post_logic: str = '',
         change: Optional[bool] = None,
         inplace: bool = True,
+        group_config: Optional[dict] = None,
     ) -> 'Beluga':
         """
         순위 선택 객관식 문항을 추가합니다.
@@ -384,7 +389,8 @@ class Beluga:
             fail=fail,
             post_logic=post_logic,
             change=change_val,
-            inplace=inplace
+            inplace=inplace,
+            group_config=group_config
         )
 
 
@@ -875,6 +881,7 @@ class Beluga:
         qid: Optional[str] = None,
         change: bool = True,
         inplace: bool = True,
+        group_config: Optional[dict] = None,
     ) -> pd.DataFrame:
         """
         문항 정보를 DataFrame에 추가하거나, 새 DataFrame을 반환합니다.
@@ -964,29 +971,38 @@ class Beluga:
         origin_options = options
 
         if isinstance(options, (list, dict)) :
-            check_group = group_rot(options)
+            check_group = group_rot(options, group_config)
             if check_group is not None :
-                rotation = True
-                if cond is not None :
-                    if isinstance(cond, list) :
-                        if not any('shuffleby' in c.lower() for c in cond) :
-                            cond.append(check_group)
+                flattened_dict = {}
+                for key, value in options.items() :
+                    if isinstance(value, (list, dict)) :
+                        flattened_dict.update(value)
                     else :
-                        if not 'shuffleby' in cond.lower() :
-                            cond = f'{cond} && {check_group}'
-                else :
-                    cond = check_group
+                        flattened_dict[key] = value
+
+                origin_options = flattened_dict
+
+                rotation = True
+                if qtype in ['객관식 단일', '객관식 중복', '객관식 순위'] :
+                    if cond is not None :
+                        if isinstance(cond, list) :
+                            if not any('shuffleby' in c.lower() for c in cond) :
+                                cond.append(check_group)
+                        else :
+                            if not 'shuffleby' in cond.lower() :
+                                cond = f'{cond} && {check_group}'
+                    else :
+                        cond = check_group
 
 
                 if isinstance(options, list) :
-                    # Flatten nested lists
-                    flattened = []
+                    flattened_list = []
                     for item in options:
                         if isinstance(item, list):
-                            flattened.extend(item)
+                            flattened_list.extend(item)
                         else:
-                            flattened.append(item)
-                    options = flattened
+                            flattened_list.append(item)
+                    options = flattened_list
                     options = [i if isinstance(i, str) else i.keys() for i in options]
 
                 elif isinstance(options, dict) :

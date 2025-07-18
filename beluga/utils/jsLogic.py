@@ -244,7 +244,7 @@ def dict_group_set(options: dict) -> Optional[dict] :
   return list(groups.values())
 
 
-def group_rot(options: Union[list, dict], config: dict = {}) -> Optional[str]:
+def group_rot(options: Union[list, dict], group_config: Optional[dict] = None) -> Optional[str]:
     if isinstance(options, list) :
       group_set = list_group_set(options)
 
@@ -258,16 +258,17 @@ def group_rot(options: Union[list, dict], config: dict = {}) -> Optional[str]:
     between_js = ',\n'.join(between_js)
 
     config_arg = {}
-    bool_list = ['group', 'option', 'topShuffle', 'botShuffle']
-    for key in bool_list :
-      if key in config :
-        config_arg[key] =  'true' if config[key] else 'false'
+    if group_config is not None :
+      bool_list = ['group', 'option', 'topShuffle', 'botShuffle']
+      for key in bool_list :
+        if key in group_config :
+          config_arg[key] =  'true' if group_config[key] else 'false'
 
-    if 'top' in config :
-      config_arg['top'] = config['top']
+      if 'top' in group_config :
+        config_arg['top'] = group_config['top']
 
-    if 'bot' in config :
-      config_arg['bot'] = config['bot']
+      if 'bot' in group_config :
+        config_arg['bot'] = group_config['bot']
 
     if len(config_arg) > 0 :
       config_arg = ',\n'.join(map(lambda x: f'\t{x[0]}: {x[1]}', config_arg.items()))
