@@ -194,8 +194,7 @@ class Beluga:
         qid: Optional[str] = None,
         options: Union[dict, list[str]] = {},
         scale: bool = False,
-        etc: bool = False,
-        etc_text: str = None,
+        etc: Union[bool, str] = False,
         na: Optional[str] = None,
         cond: Optional[Union[str, list[str]]] = None,
         piping: Union[str, int, BelugaQuestion] = None,
@@ -243,7 +242,6 @@ class Beluga:
             title=title,
             options=options,
             etc=etc,
-            etc_text=etc_text,
             na=na,
             cond=cond,
             piping=piping,
@@ -261,8 +259,7 @@ class Beluga:
         title: str,
         qid: Optional[str] = None,
         options: Union[dict, list[str]] = {},
-        etc: bool = False,
-        etc_text: str = None,
+        etc: Union[bool, str] = False,
         na: Optional[str] = None,
         cond: Optional[Union[str, list[str]]] = None,
         min: Optional[int] = 1,
@@ -310,7 +307,6 @@ class Beluga:
             title=title,
             options=options,
             etc=etc,
-            etc_text=etc_text,
             na=na,
             cond=cond,
             min=min,
@@ -331,8 +327,7 @@ class Beluga:
         title: str,
         qid: Optional[str] = None,
         options: Union[dict, list[str]] = {},
-        etc: bool = False,
-        etc_text: str = None,
+        etc: Union[bool, str] = False,
         na: Optional[str] = None,
         cond: Optional[Union[str, list[str]]] = None,
         min: Optional[int] = 1,
@@ -380,7 +375,6 @@ class Beluga:
             title=title,
             options=options,
             etc=etc,
-            etc_text=etc_text,
             na=na,
             cond=cond,
             min=min,
@@ -868,8 +862,7 @@ class Beluga:
         qtype: str,
         title: str,
         options: Union[dict, list[str], str] = {},
-        etc: bool = False,
-        etc_text: str = None,
+        etc: Union[bool, str] = False,
         na: Optional[str] = None,
         cond: Optional[Union[str, list[str]]] = None,
         min: Optional[int] = None,
@@ -893,7 +886,6 @@ class Beluga:
             title (str): 질문 제목
             options (Union[dict, str]): 선택지 목록 또는 문자열
             etc (bool): 기타 선택지 포함 여부
-            etc_text (str): 기타 선택지 텍스트. None인 경우 기본값 사용
             na (Optional[str]): 무응답 옵션
             cond (Optional[Union[str, list[str]]]): 조건문
             min (Optional[int]): 최소값/최소 선택 개수
@@ -910,7 +902,7 @@ class Beluga:
         Returns:
             pd.DataFrame: 추가된 문항의 DataFrame
         """
-        options = options.copy()
+        set_options = options.copy() if isinstance(options, (list, dict)) else options
         if piping is not None :
             if na != '' and na is not None :
                 caution_message(f"`없음`의 경우 임포트할 때 파이핑하는 문항의 없음 보기 라벨이 됩니다. (벨루가 에디터에서 수정 필요)")
@@ -927,8 +919,8 @@ class Beluga:
                 raise BelugaValidationError(f"piping에 해당하는 문항이 없습니다. {piping}")
 
 
-            if len(options) == 0 or options is None :
-                options = base.options
+            if len(set_options) == 0 or set_options is None :
+                set_options = base.options
 
                 if base.etc :
                     etc = True
@@ -938,7 +930,7 @@ class Beluga:
                 if not selected_piping :
                     piping = f'!{piping}'
             else :
-                if len(base.options) == len(options) :
+                if len(base.options) == len(set_options) :
                     piping = ''
                     must_show = []
                     if etc :
@@ -966,17 +958,17 @@ class Beluga:
                     else :
                         cond = piping_cond
                 else :
-                    raise BelugaValidationError(f"파이핑하는 문항의 보기 개수가 다릅니다. {base.qnum}번 문항: {len(base.options)}개, {qid}번 문항: {len(options)}개")
+                    raise BelugaValidationError(f"파이핑하는 문항의 보기 개수가 다릅니다. {base.qnum}번 문항: {len(base.options)}개, {qid}번 문항: {len(set_options)}개")
         else :
             piping = ''
 
-        origin_options = options
+        origin_options = set_options
 
-        if isinstance(options, (list, dict)) :
-            check_group = group_rot(options, group_config)
+        if isinstance(set_options, (list, dict)) :
+            check_group = group_rot(set_options, group_config)
             if check_group is not None :
                 flattened_dict = {}
-                for key, value in options.items() :
+                for key, value in set_options.items() :
                     if isinstance(value, (list, dict)) :
                         flattened_dict.update(value)
                     else :
@@ -997,35 +989,38 @@ class Beluga:
                         cond = check_group
 
 
-                if isinstance(options, list) :
+                if isinstance(set_options, list) :
                     flattened_list = []
-                    for item in options:
+                    for item in set_options:
                         if isinstance(item, list):
                             flattened_list.extend(item)
                         else:
                             flattened_list.append(item)
-                    options = flattened_list
-                    options = [i if isinstance(i, str) else i.keys() for i in options]
+                    set_options = flattened_list
+                    set_options = [i if isinstance(i, str) else i.keys() for i in set_options]
 
-                elif isinstance(options, dict) :
+                elif isinstance(set_options, dict) :
                     # Flatten nested dicts
-                    flattened_dict = {}
-                    for key, value in options.items():
+                    flattened = {}
+                    for key, value in set_options.items():
                         if isinstance(value, dict):
-                            flattened_dict.update(value)
+                            flattened.update(value)
                         else:
-                            flattened_dict[key] = value
-                    options = flattened_dict
+                            flattened[key] = value
+                    set_options = flattened
 
 
-        if etc :
-            if isinstance(options, dict) and options:
-                keys = list(options.keys())
+        etc_flag = True if isinstance(etc, str) else etc
+        etc_text = etc if isinstance(etc, str) else self.etc_text
+
+        if etc_flag :
+            if isinstance(set_options, dict) and set_options:
+                keys = list(set_options.keys())
                 max_key = sorted([int(k) for k in keys])[-1]
-                options[max_key + 1] = self.etc_text if etc_text is None else etc_text
+                set_options[max_key + 1] = etc_text
 
-            elif isinstance(options, list) :
-                options.append(self.etc_text if etc_text is None else etc_text)
+            elif isinstance(set_options, list) :
+                set_options.append(etc_text)
 
         # 조건 처리
         if cond is not None:
@@ -1035,8 +1030,8 @@ class Beluga:
             cond = ''
 
 
-        if isinstance(options, (list, dict)) :
-            options = self._format_options(options, na, etc_text)
+        if isinstance(set_options, (list, dict)) :
+            set_options = self._format_options(set_options, na, etc_text)
 
         if cond is not None :
             cond = cond.strip()
@@ -1064,11 +1059,11 @@ class Beluga:
 
         if inplace:
             self._append_inplace(
-                qtype, title, options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, change, etc_text
+                qtype, title, set_options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, change, etc_text
             )
         else:
             self._create_dummy_df(
-                qtype, title, options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, etc_text
+                qtype, title, set_options, na, cond, min, max, piping, rotation, fail, post_logic, post_text, qid, etc_text
             )
 
         # Attributes
@@ -1082,10 +1077,9 @@ class Beluga:
                     qid=qid,
                     qnum=qnum,
                     title=title,
-                    options=options,
+                    options=set_options,
                     na=na,
                     etc=etc,
-                    etc_text=etc_text,
                     cond=cond,
                     min=min,
                     max=max,
@@ -1106,10 +1100,9 @@ class Beluga:
                 qid=qid,
                 qnum=qnum,
                 title=title,
-                options=options,
+                options=set_options,
                 na=na,
                 etc=etc,
-                etc_text=etc_text,
                 cond=cond,
                 min=min,
                 max=max,
