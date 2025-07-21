@@ -920,7 +920,7 @@ class Beluga:
 
 
             if len(set_options) == 0 or set_options is None :
-                set_options = base.options
+                set_options = base.options.copy()
 
                 if base.etc :
                     etc = True
@@ -934,7 +934,7 @@ class Beluga:
                     piping = ''
                     must_show = []
                     if etc :
-                        must_show.append(len(base.options)+1)
+                        must_show.append(len(base.options.copy())+1)
 
                     if na != '' and na is not None :
                         must_show.append(-1)
