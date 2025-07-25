@@ -199,6 +199,7 @@ class Beluga:
         cond: Optional[Union[str, list[str]]] = None,
         piping: Union[str, int, BelugaQuestion] = None,
         selected_piping: bool = True,
+        piping_default_cond: bool = True,
         rotation: Optional[bool] = None,
         fail: str = '',
         post_logic: str = '',
@@ -246,6 +247,7 @@ class Beluga:
             cond=cond,
             piping=piping,
             selected_piping=selected_piping,
+            piping_default_cond=piping_default_cond,
             rotation=rotation_val,
             fail=fail,
             post_logic=post_logic,
@@ -266,6 +268,7 @@ class Beluga:
         max: Optional[int] = None,
         piping: Union[str, int, BelugaQuestion] = None,
         selected_piping: bool = True,
+        piping_default_cond: bool = True,
         rotation: Optional[bool] = None,
         fail: str = '',
         post_logic: str = '',
@@ -313,6 +316,7 @@ class Beluga:
             max=max,
             piping=piping,
             selected_piping=selected_piping,
+            piping_default_cond=piping_default_cond,
             rotation=rotation_val,
             fail=fail,
             post_logic=post_logic,
@@ -334,6 +338,7 @@ class Beluga:
         max: Optional[int] = None,
         piping: Union[str, int, BelugaQuestion] = None,
         selected_piping: bool = True,
+        piping_default_cond: bool = True,
         rotation: Optional[bool] = None,
         fail: str = '',
         post_logic: str = '',
@@ -381,6 +386,7 @@ class Beluga:
             max=max,
             piping=piping,
             selected_piping=selected_piping,
+            piping_default_cond=piping_default_cond,
             rotation=rotation_val,
             fail=fail,
             post_logic=post_logic,
@@ -869,6 +875,7 @@ class Beluga:
         max: Optional[int] = None,
         piping: Union[str, int, BelugaQuestion] = None,
         selected_piping: bool = True,
+        piping_default_cond: bool = True,
         rotation: bool = False,
         fail: str = '',
         post_logic: str = '',
@@ -925,10 +932,24 @@ class Beluga:
                 if base.etc :
                     etc = True
 
-                piping = f'Q{base.qnum}'
+                base_qid = f'Q{base.qnum}'
+                piping = base_qid
+                default_piping_base = f'(!{piping}A0 && {piping}CNT >= 1)'
 
                 if not selected_piping :
-                    piping = f'!{piping}'
+                    piping = f'!{base_qid}'
+                    base_option_count = len(base.options)
+                    default_piping_base = f'({base_qid}CNT !== {base_option_count})'
+
+                if piping_default_cond :
+                    if cond is not None :
+                        if isinstance(cond, list) :
+                            cond = [default_piping_base, *cond]
+                        else :
+                            cond = f'{default_piping_base} && {cond}'
+                    else :
+                        cond = default_piping_base
+
             else :
                 if len(base.options) == len(set_options) :
                     piping = ''
