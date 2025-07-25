@@ -1022,6 +1022,8 @@ class Beluga:
             elif isinstance(set_options, list) :
                 set_options.append(etc_text)
 
+            origin_options = set_options
+
         # 조건 처리
         if cond is not None:
             if isinstance(cond, list):
@@ -1056,6 +1058,7 @@ class Beluga:
         if qtype in ['객관식 중복', '객관식 순위'] :
             if max is None :
                 max = len(origin_options)
+
 
         if inplace:
             self._append_inplace(
