@@ -939,6 +939,9 @@ class Beluga:
                 if not selected_piping :
                     piping = f'!{base_qid}'
                     base_option_count = len(base.options)
+                    if base.etc :
+                        base_option_count += 1
+
                     default_piping_base = f'({base_qid}CNT !== {base_option_count})'
 
                 if piping_default_cond :
