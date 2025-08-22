@@ -26,23 +26,79 @@ def extract_qids(text: str) -> List[str]:
 
 def quota_combination(quota_list: str, show: bool = True) -> Union[str, None]:
     def parse_js_object_to_dict(js_obj_str):
-        # 각 object 블록을 추출
-        obj_pattern = re.compile(r"(\w+)\s*:\s*\{([^}]*)\}", re.DOTALL)
+        # 각 object 블록을 추출 (중첩된 중괄호, 배열 등도 안전하게 파싱)
+        def find_balanced_brace(s, start):
+            """여는 중괄호 위치(start)에서 닫는 중괄호 위치 반환"""
+            depth = 0
+            for i in range(start, len(s)):
+                if s[i] == '{':
+                    depth += 1
+                elif s[i] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        return i
+            return -1
+
         result = {}
-        for obj_match in obj_pattern.finditer(js_obj_str):
-            obj_name = obj_match.group(1)
-            obj_body = obj_match.group(2)
-            # 각 key-value 쌍을 추출
-            kv_pattern = re.compile(r"'([^']+)'\s*:\s*([^,]+),?")
+        obj_pattern = re.compile(r"(\w+)\s*:\s*\{", re.DOTALL)
+        pos = 0
+        while True:
+            m = obj_pattern.search(js_obj_str, pos)
+            if not m:
+                break
+            obj_name = m.group(1)
+            brace_start = m.end() - 1
+            brace_end = find_balanced_brace(js_obj_str, brace_start)
+            if brace_end == -1:
+                break
+            obj_body = js_obj_str[brace_start + 1:brace_end]
+
+            # key-value 쌍 추출: value에 배열([])이나 괄호, 중첩된 구조가 있어도 안전하게 파싱
+            # 콤마(,)가 배열이나 괄호 내부에 있을 수 있으므로, 수동 파싱
             obj_dict = {}
-            for kv_match in kv_pattern.finditer(obj_body):
-                k = kv_match.group(1)
-                v = kv_match.group(2).strip()
+            idx = 0
+            length = len(obj_body)
+            while idx < length:
+                # key 추출
+                key_match = re.match(r"\s*'([^']+)'\s*:", obj_body[idx:])
+                if not key_match:
+                    idx += 1
+                    continue
+                k = key_match.group(1)
+                idx += key_match.end()
+
+                # value 추출 (괄호, 대괄호, 중괄호 등 중첩 고려)
+                v_start = idx
+                depth = 0
+                in_str = False
+                str_char = ''
+                while idx < length:
+                    c = obj_body[idx]
+                    if in_str:
+                        if c == str_char:
+                            in_str = False
+                    elif c in ("'", '"'):
+                        in_str = True
+                        str_char = c
+                    elif c in "([{":
+                        depth += 1
+                    elif c in ")]}":
+                        if depth > 0:
+                            depth -= 1
+                    elif c == ',' and depth == 0:
+                        break
+                    idx += 1
+                v = obj_body[v_start:idx].strip()
                 obj_dict[k] = v
+                # 콤마 스킵
+                while idx < length and obj_body[idx] != "'":
+                    idx += 1
             result[obj_name] = obj_dict
+            pos = brace_end + 1
         return result
 
     parse_dict = parse_js_object_to_dict(quota_list)
+
 
     quota_logics = list(parse_dict.values())
 
