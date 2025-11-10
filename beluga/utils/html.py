@@ -9,8 +9,7 @@ multi_input_with_label = '''<div class="multi multi-{code}" style="display: flex
 multi_total = '''<div class="multi-total" style="display: flex;flex-direction: column;gap: 5px;border-top: 1px solid #ccc;padding-top: 7px;margin-bottom: 7px;"> <label for="xTotal">{total_label}</label> <div style="display: flex; gap:5px; align-items: center;"> <input type="number" id="xTotal" style="border: 1px solid #ccc; border-radius: 7px; height: 25px; width: 100%; max-width: {width};background-color: #ececec; color: rgb(245, 94, 94);font-weight: bold;" readonly/>{post_text} </div> </div>'''
 
 dropdown_container = '''<div class="multi-container" style="display:flex; flex-direction: column; gap: 20px; width: 100%;">{html}</div>'''
-dropdown_html = '''<div class="multi multi-{code}" style="display:flex; flex-direction: column; gap: 5px;"> <label for="x{code}">{label}</label> <div style="display: flex; gap: 10px; align-items: center;"> <select id="x1" style="width: 100%;min-height: 30px;border: 1px solid #ccc;border-radius: 7px;"> <option value="">{placeholder}</option>{options} </select> </div> </div> '''
-
+dropdown_html = '''<div class="multi multi-{code}" style="display:flex; flex-direction: column; gap: 5px;"> <label for="x{code}">{label}</label> <div style="display: flex; gap: 10px; align-items: center;"> <select id="x{code}" style="width: 100%;min-height: 30px;border: 1px solid #ccc;border-radius: 7px;"> <option value="">{placeholder}</option>{options} </select> </div> </div> '''
 
 
 def set_multi_input(
