@@ -913,9 +913,9 @@ class Beluga:
 
         if option_cond is not None :
             if isinstance(option_cond, BelugaQuestion):
-                js += f'.optionCond({{base: {option_cond.qnum}}})'
+                js += f'.optionCond({option_cond.qnum})'
             else:
-                js += f'.optionCond({{base: {option_cond}}})'
+                js += f'.optionCond({option_cond})'
 
         if multi_cond is not None :
             if isinstance(multi_cond, BelugaQuestion):
