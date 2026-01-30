@@ -424,6 +424,7 @@ class Beluga:
         fail: str = '',
         post_logic: str = '',
         change: Optional[bool] = None,
+        set_js: bool = True,
         multi: Optional[Union[int, list[str], dict]] = None,
         multi_cond: Optional[Union[str, int]] = None,
         multi_atleast: bool = False,
@@ -441,6 +442,7 @@ class Beluga:
             fail (str): 조건 실패시 이동할 위치
             post_logic (str): 응답 후 로직
             change (bool): 기존 QID 변경 여부
+            set_js (bool): 자바스크립트 설정 여부
             multi (Optional[Union[int, list[str]]]): 다중 입력 설정 (개수 또는 라벨 목록)
             multi_atleast (bool): 다중 입력시 최소 하나 이상 입력 필수 여부
             multi_post (str): 다중 입력 후 텍스트
@@ -452,20 +454,20 @@ class Beluga:
         """
         change_val = self.config.change if change is None else change
 
-        if multi_cond is not None :
-            chk_multi = self._check_multi_cond(multi_cond)
-            multi_cond_js = chk_multi['js']
-            multi_atleast = False
-            if cond is not None :
-                if isinstance(cond, list) :
-                    cond.append(multi_cond_js)
-                else :
-                    cond += f' && {multi_cond_js}'
-            else :
-                cond = multi_cond_js
+        # if multi_cond is not None :
+        #     chk_multi = self._check_multi_cond(multi_cond)
+        #     multi_cond_js = chk_multi['js']
+        #     multi_atleast = False
+        #     if cond is not None :
+        #         if isinstance(cond, list) :
+        #             cond.append(multi_cond_js)
+        #         else :
+        #             cond += f' && {multi_cond_js}'
+        #     else :
+        #         cond = multi_cond_js
 
-            if multi is None :
-                multi = chk_multi['base'].options
+        #     if multi is None :
+        #         multi = chk_multi['base'].options
 
         if multi is not None :
             if isinstance(multi, (int, list, dict)) :
@@ -474,19 +476,24 @@ class Beluga:
                 raise BelugaValidationError("multi는 int, list[str], dict 형식이어야 합니다.")
             title = f'{title}\n{multi_html}'
 
-            js = None
+            js = 'oMultiQuestion()'
 
-            if multi_atleast :
-                js = multi_text_atleast_js.format(text_atleast_error=dict_to_str(self.config.text_atleast_error))
-            else :
-                js = multi_text_all_js.format(text_all_error=dict_to_str(self.config.text_all_error))
-            if cond is not None :
-                if isinstance(cond, list) :
-                    cond.append(js)
-                else :
-                    cond += f' && {js}'
-            else :
-                cond = js
+            # if multi_atleast :
+            #     js = multi_text_atleast_js.format(text_atleast_error=dict_to_str(self.config.text_atleast_error))
+            # else :
+            #     js = multi_text_all_js.format(text_all_error=dict_to_str(self.config.text_all_error))
+
+            if multi_cond is not None :
+                js += f'.rowCond({multi_cond})'
+
+            if set_js:
+                if cond is not None:
+                    if isinstance(cond, list):
+                        cond.append(js)
+                    else:
+                        cond += f' && {js}'
+                else:
+                    cond = js
 
         return self.append_question(
             qid=qid,
@@ -625,6 +632,7 @@ class Beluga:
         post_logic: str = '',
         post_text: str = '',
         change: Optional[bool] = None,
+        set_js: bool = True,
         multi: Optional[Union[int, list[str], dict]] = None,
         multi_cond: Optional[Union[str, int]] = None,
         multi_width: str = '70px',
@@ -644,6 +652,7 @@ class Beluga:
             fail (str): 조건 실패시 이동할 위치
             post_logic (str): 응답 후 로직
             change (bool): 기존 QID 변경 여부
+            set_js (bool): 자바스크립트 설정 여부
             multi (Optional[Union[int, list[str]]]): 다중 입력 설정 (개수 또는 라벨 목록)
             multi_width (str): 입력 필드 너비
             inplace (bool): 현재 인스턴스에 추가할지 여부
@@ -658,20 +667,20 @@ class Beluga:
 
         qtype = '주관식 숫자'
 
-        if multi_cond is not None :
-            qtype = '주관식 문자'
-            chk_multi = self._check_multi_cond(multi_cond)
-            multi_cond_js = chk_multi['js']
-            if cond is not None :
-                if isinstance(cond, list) :
-                    cond.append(multi_cond_js)
-                else :
-                    cond += f' && {multi_cond_js}'
-            else :
-                cond = multi_cond_js
+        # if multi_cond is not None :
+        #     qtype = '주관식 문자'
+        #     chk_multi = self._check_multi_cond(multi_cond)
+        #     multi_cond_js = chk_multi['js']
+        #     if cond is not None :
+        #         if isinstance(cond, list) :
+        #             cond.append(multi_cond_js)
+        #         else :
+        #             cond += f' && {multi_cond_js}'
+        #     else :
+        #         cond = multi_cond_js
 
-            if multi is None :
-                multi = chk_multi['base'].options
+        #     if multi is None :
+        #         multi = chk_multi['base'].options
 
         if total is not None and multi is None :
             raise BelugaValidationError("multi 형태로 변경 필요")
@@ -685,15 +694,22 @@ class Beluga:
 
             title = f'{title}\n{multi_html}'
 
-            js = multi_num_js.format(min=min, max=max, total=total if total is not None else 'null', num_error=dict_to_str(self.config.num_error))
+            # js = multi_num_js.format(min=min, max=max, total=total if total is not None else 'null', num_error=dict_to_str(self.config.num_error))
+            js = f"oMultiQuestion({{type: 'number'}}).setRange({{min: {min}, max: {max}}})"
+            if total is not None :
+                js += f".setTotal({total})"
 
-            if cond is not None :
-                if isinstance(cond, list) :
-                    cond.append(js)
-                else :
-                    cond += f' && {js}'
-            else :
-                cond = js
+            if multi_cond is not None :
+                js += f'.rowCond({multi_cond})'
+
+            if set_js:
+                if cond is not None:
+                    if isinstance(cond, list):
+                        cond.append(js)
+                    else:
+                        cond += f' && {js}'
+                else:
+                    cond = js
 
         return self.append_question(
             qid=qid,
@@ -813,8 +829,10 @@ class Beluga:
         qid: Optional[str] = None,
         cond: Optional[Union[str, list[str]]] = None,
         options: Union[dict, list[str]] = {},
+        set_js: bool = True,
         multi: Union[dict, list[str]] = {},
         multi_cond: Optional[Union[str, int]] = None,
+        option_cond: Optional[Union[str, int]] = None,
         duplicate: bool = False,
         fail: str = '',
         post_logic: str = '',
@@ -831,25 +849,37 @@ class Beluga:
         selects = set_dropdown(options=options, rows=multi, placeholder=self.dropdown_placeholder)
         title = f'{title}\n{selects}'
 
-        if multi_cond is not None :
-            chk_multi = self._check_multi_cond(multi_cond)
-            multi_cond_js = chk_multi['js']
-            if cond is not None :
-                if isinstance(cond, list) :
-                    cond.append(multi_cond_js)
-                else :
-                    cond += f' && {multi_cond_js}'
-            else :
-                cond = multi_cond_js
+        # if multi_cond is not None :
+        #     chk_multi = self._check_multi_cond(multi_cond)
+        #     multi_cond_js = chk_multi['js']
+        #     if cond is not None :
+        #         if isinstance(cond, list) :
+        #             cond.append(multi_cond_js)
+        #         else :
+        #             cond += f' && {multi_cond_js}'
+        #     else :
+        #         cond = multi_cond_js
 
-        js = dropdown_js.format(duplicate= 'true' if duplicate else 'false', dropdown_error=dict_to_str(self.config.dropdown_error))
-        if cond is not None :
-            if isinstance(cond, list) :
-                cond.append(js)
-            else :
-                cond += f' && {js}'
-        else :
-            cond = js
+        # js = dropdown_js.format(duplicate= 'true' if duplicate else 'false', dropdown_error=dict_to_str(self.config.dropdown_error))
+        js = f"oMultiQuestion({{type: 'dropdown'}})"
+
+        if duplicate :
+            js += '.setDup()'
+
+        if option_cond is not None :
+            js += f'.optionCond({{base: {option_cond}}})'
+
+        if multi_cond is not None :
+            js += f'.rowCond({multi_cond})'
+
+        if set_js:
+            if cond is not None:
+                if isinstance(cond, list):
+                    cond.append(js)
+                else:
+                    cond += f' && {js}'
+            else:
+                cond = js
 
 
         return self.append_question(
@@ -1325,26 +1355,26 @@ class Beluga:
         if sys.platform.startswith('win'):
             os.startfile(path)
 
+        # 2026.01.30 사전 로직 파일 이제 생성하지 않음
+        # cond_data = self.df[self.df['조건'].notna()]['조건'].tolist()
+        # js_code = []
+        # if cond_data :
+        #     for key, js in pre_logic_dict.items() :
+        #         append_flag = False
+        #         if any(key in cond for cond in cond_data) :
+        #             append_flag = True
+        #             js_code.append(js)
 
-        cond_data = self.df[self.df['조건'].notna()]['조건'].tolist()
-        js_code = []
-        if cond_data :
-            for key, js in pre_logic_dict.items() :
-                append_flag = False
-                if any(key in cond for cond in cond_data) :
-                    append_flag = True
-                    js_code.append(js)
+        #         if not append_flag :
+        #             if key == 'validate' :
+        #                 if any(any(c in cond for c in ['exec', 'cond', 'hangle']) for cond in cond_data) :
+        #                     js_code.append(js)
 
-                if not append_flag :
-                    if key == 'validate' :
-                        if any(any(c in cond for c in ['exec', 'cond', 'hangle']) for cond in cond_data) :
-                            js_code.append(js)
+        #             if key == 'optionPosition' :
+        #                 if any(any(c in cond for c in ['nextTo', 'beforeTo', 'topPosition']) for cond in cond_data) :
+        #                     js_code.append(js)
 
-                    if key == 'optionPosition' :
-                        if any(any(c in cond for c in ['nextTo', 'beforeTo', 'topPosition']) for cond in cond_data) :
-                            js_code.append(js)
-
-        if js_code :
-            with open('pre-logic.js', 'w', encoding='utf-8') as f :
-                f.write('\n\n'.join(js_code))
+        # if js_code :
+        #     with open('pre-logic.js', 'w', encoding='utf-8') as f :
+        #         f.write('\n\n'.join(js_code))
 
