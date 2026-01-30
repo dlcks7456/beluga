@@ -1,6 +1,6 @@
 from typing import Optional, Union, List
 
-multi_container = '''<div class="multi-container" style="width: 100%;display: flex;flex-direction: column;gap: 10px;padding: 5px;">{html}{total}</div>'''
+multi_container = '''<div class="multi-container" style="width: 100%;display: flex;flex-direction: column;gap: 10px;padding: 5px;margin-bottom: 7px;">{html}{total}</div>'''
 
 multi_input = '''<div class="multi multi-{code}"> <div style="display: flex; gap:5px; align-items: center;"> <input type="text" id="x{code}" style="border: 1px solid #ccc; border-radius: 7px; height: 25px; width: 100%; max-width: {width};"/>{post_text} </div> </div>'''
 
