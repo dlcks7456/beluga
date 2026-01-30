@@ -426,7 +426,8 @@ class Beluga:
         change: Optional[bool] = None,
         set_js: bool = True,
         multi: Optional[Union[int, list[str], dict]] = None,
-        multi_cond: Optional[Union[str, int]] = None,
+        multi_cond: Optional[Union[str, int, BelugaQuestion]] = None,
+        multi_shuffle: Union[bool, str, int, BelugaQuestion] = False,
         multi_atleast: bool = False,
         multi_post: str = None,
         multi_width: str = '200px',
@@ -483,8 +484,22 @@ class Beluga:
             # else :
             #     js = multi_text_all_js.format(text_all_error=dict_to_str(self.config.text_all_error))
 
+            if not multi_atleast:
+                js += '.setEvery()'
+
+            if multi_shuffle :
+                if isinstance(multi_shuffle, BelugaQuestion):
+                    js += f'.setShuffle({multi_shuffle.qnum})'
+                elif isinstance(multi_shuffle, bool):
+                    js += '.setShuffle()'
+                else :
+                    js += f'.setShuffle({multi_shuffle})'
+
             if multi_cond is not None :
-                js += f'.rowCond({multi_cond})'
+                if isinstance(multi_cond, BelugaQuestion):
+                    js += f'.rowCond({multi_cond.qnum})'
+                else:
+                    js += f'.rowCond({multi_cond})'
 
             if set_js:
                 if cond is not None:
@@ -634,7 +649,8 @@ class Beluga:
         change: Optional[bool] = None,
         set_js: bool = True,
         multi: Optional[Union[int, list[str], dict]] = None,
-        multi_cond: Optional[Union[str, int]] = None,
+        multi_cond: Optional[Union[str, int, BelugaQuestion]] = None,
+        multi_shuffle: Union[bool, str, int, BelugaQuestion] = False,
         multi_width: str = '70px',
         inplace: bool = True,
     ) -> 'Beluga':
@@ -699,8 +715,19 @@ class Beluga:
             if total is not None :
                 js += f".setTotal({total})"
 
+            if multi_shuffle :
+                if isinstance(multi_shuffle, BelugaQuestion):
+                    js += f'.setShuffle({multi_shuffle.qnum})'
+                elif isinstance(multi_shuffle, bool):
+                    js += '.setShuffle()'
+                else :
+                    js += f'.setShuffle({multi_shuffle})'
+
             if multi_cond is not None :
-                js += f'.rowCond({multi_cond})'
+                if isinstance(multi_cond, BelugaQuestion):
+                    js += f'.rowCond({multi_cond.qnum})'
+                else:
+                    js += f'.rowCond({multi_cond})'
 
             if set_js:
                 if cond is not None:
@@ -831,8 +858,10 @@ class Beluga:
         options: Union[dict, list[str]] = {},
         set_js: bool = True,
         multi: Union[dict, list[str]] = {},
-        multi_cond: Optional[Union[str, int]] = None,
-        option_cond: Optional[Union[str, int]] = None,
+        multi_cond: Optional[Union[str, int, BelugaQuestion]] = None,
+        multi_shuffle: Union[bool, str, int, BelugaQuestion] = False,
+        option_cond: Optional[Union[str, int, BelugaQuestion]] = None,
+        option_shuffle: Union[bool, str, int, BelugaQuestion] = False,
         duplicate: bool = False,
         fail: str = '',
         post_logic: str = '',
@@ -866,11 +895,33 @@ class Beluga:
         if duplicate :
             js += '.setDup()'
 
+        if multi_shuffle :
+            if isinstance(multi_shuffle, BelugaQuestion):
+                js += f'.setShuffle({multi_shuffle.qnum})'
+            elif isinstance(multi_shuffle, bool):
+                js += '.setShuffle()'
+            else :
+                js += f'.setShuffle({multi_shuffle})'
+
+        if option_shuffle :
+            if isinstance(option_shuffle, BelugaQuestion):
+                js += f'.optionShuffle({{by: {option_shuffle.qnum}}})'
+            elif isinstance(option_shuffle, bool):
+                js += '.optionShuffle()'
+            else :
+                js += f'.optionShuffle({{by: {option_shuffle}}})'
+
         if option_cond is not None :
-            js += f'.optionCond({{base: {option_cond}}})'
+            if isinstance(option_cond, BelugaQuestion):
+                js += f'.optionCond({{base: {option_cond.qnum}}})'
+            else:
+                js += f'.optionCond({{base: {option_cond}}})'
 
         if multi_cond is not None :
-            js += f'.rowCond({multi_cond})'
+            if isinstance(multi_cond, BelugaQuestion):
+                js += f'.rowCond({multi_cond.qnum})'
+            else:
+                js += f'.rowCond({multi_cond})'
 
         if set_js:
             if cond is not None:
@@ -1034,10 +1085,10 @@ class Beluga:
                 if qtype in ['객관식 단일', '객관식 중복', '객관식 순위'] :
                     if cond is not None :
                         if isinstance(cond, list) :
-                            if not any('shuffleby' in c.lower() for c in cond) :
+                            if not any('oShuffleby' in c.lower() for c in cond) :
                                 cond.append(check_group)
                         else :
-                            if not 'shuffleby' in cond.lower() :
+                            if not 'oShuffleby' in cond.lower() :
                                 cond = f'{cond} && {check_group}'
                     else :
                         cond = check_group
